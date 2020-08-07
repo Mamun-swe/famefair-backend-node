@@ -65,12 +65,12 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
     let { email, password } = req.body
     try {
-        let admin = await Admin.findOne({ email: email }).exec()
+        let admin = await Admin.findOne({$and: [{ email: email }, { status: {$ne: 'blocked'} }]}).exec()
         if (admin) {
             const result = await bcrypt.compare(password, admin.password)
             if (result) {
                 const token = await jwt.sign({ id: admin._id, name: admin.name, email: admin.email, role: admin.role }, 'SECRET', { expiresIn: '1d' })
-                const updateToken = await Admin.findOneAndUpdate({ _id: admin._id }, { $set: { 'access_token': token } }, { new: true }).exec()
+                const updateToken = await Admin.findOneAndUpdate({ _id: admin._id }, { $set: { 'access_token': token, 'status': 'online' } }, { new: true }).exec()
                 if (updateToken) {
                     return res.status(200).json({
                         message: true,
@@ -97,13 +97,12 @@ const passwordReset = async (req, res, next) => {
 }
 
 
-// Me
-const myProfile = async (req, res, next) => {
+// Show
+const Show = async (req, res, next) => {
+    let { id } = req.params
     try {
-        const token = req.headers.authorization.split(' ')[1]
-        const decode = jwt.verify(token, 'SECRET')
-
-        let admin = await Admin.findOne({ $and: [{ _id: decode.id }, { email: decode.email }] }, { password: 0, access_token: 0 })
+        await checkId(id)
+        let admin = await Admin.findOne({ _id: id }).exec()
         if (!admin) {
             return res.status(204).json({ message: false })
         }
@@ -163,12 +162,35 @@ const blockAccount = async (req, res, next) => {
     }
 }
 
+
+// Update Account
+const updateAccount = async (req, res, next) => {
+    let { id } = req.params
+    let { name, email, phoneNumber, role } = req.body
+    try {
+        await checkId(id)
+        const admin = await Admin.findOneAndUpdate({ _id: id },
+            { $set: { name, email, phoneNumber, role } },
+            { new: true }
+        ).exec()
+
+        if (!admin) {
+            return res.status(204).json({ message: false })
+        }
+        res.status(200).json({ message: true })
+
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     Index,
     register,
     login,
-    myProfile,
+    Show,
     passwordReset,
     logout,
-    blockAccount
+    blockAccount,
+    updateAccount
 }
