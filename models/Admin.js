@@ -41,6 +41,11 @@ const adminSchema = new Schema({
         default: "admin",
         enum: ["admin", "super_admin", "order_management"]
     },
+    status: {
+        type: String,
+        default: "offline",
+        enum: ["online", "offline", "blocked"]
+    },
     access_token: {
         type: String,
         trim: true,
@@ -50,6 +55,6 @@ const adminSchema = new Schema({
     timestamps: true
 })
 
-const Admin = model('admin', adminSchema)
+const Admin = model('Admin', adminSchema)
 
 module.exports = Admin;

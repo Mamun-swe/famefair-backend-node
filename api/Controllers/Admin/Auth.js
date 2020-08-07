@@ -1,6 +1,20 @@
 const Admin = require('../../../models/Admin')
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
+const checkId = require('../../Middleware/mongooseId')
+
+
+const Index = async (req, res, next) => {
+    try {
+        const admins = await Admin.find({}, { password: 0, access_token: 0 }).sort({ _id: -1 })
+        if (!admins) {
+            return res.status(204).json({ message: 'Admin not found' })
+        }
+        res.status(200).json({ admins })
+    } catch (error) {
+        next(error)
+    }
+}
 
 const register = async (req, res, next) => {
     let { name, email, phoneNumber, password, role } = req.body
@@ -9,7 +23,7 @@ const register = async (req, res, next) => {
 
         if (existAdmin) {
             return res.status(409).json({
-                message: "exist"
+                message: "Admin already created"
             })
         }
 
@@ -128,10 +142,33 @@ const logout = async (req, res, next) => {
 }
 
 
+// Block Account
+const blockAccount = async (req, res, next) => {
+    const { id } = req.params
+    const { status } = req.query
+    try {
+        await checkId(id)
+        const admin = await Admin.findByIdAndUpdate({ _id: id },
+            { $set: { status } },
+            { new: true }
+        ).exec()
+
+        if (!admin) {
+            return res.status(204).json({ message: false })
+        }
+        res.status(200).json({ message: true })
+
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
+    Index,
     register,
     login,
     myProfile,
     passwordReset,
-    logout
+    logout,
+    blockAccount
 }

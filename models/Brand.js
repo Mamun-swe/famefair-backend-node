@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose")
 
-const categorySchema = new Schema({
+const brandSchema = new Schema({
     products:[{
         type: Schema.Types.ObjectId,
         ref: 'Product'
@@ -21,6 +21,6 @@ const categorySchema = new Schema({
     timestamps: true
 })
 
-const Category = model('Category', categorySchema)
+const Brand = model('Brand', brandSchema)
 
-module.exports = Category;
+module.exports = Brand;

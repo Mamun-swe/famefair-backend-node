@@ -12,15 +12,24 @@ app.use(bodyParser.json())
 app.use(cors())
 app.use(fileUpload())
 
-app.use('/uploads/category', express.static('uploads/category/'));
+app.use('/uploads/category', express.static('uploads/category/'))
+app.use('/uploads/brand', express.static('uploads/brand/'))
+app.use('/uploads/banner', express.static('uploads/banner/'))
+app.use('/uploads/product', express.static('uploads/product/'))
 
 // Main Routes
 const adminAuthRoute = require("./api/Routes/Admin/Auth")
 const adminCategoryRoute = require("./api/Routes/Admin/Category")
+const adminBrandRoute = require("./api/Routes/Admin/Brand")
+const adminBannerRoute = require("./api/Routes/Admin/Banner")
+const adminProductRoute = require("./api/Routes/Admin/Product")
 
 // API URL's
 app.use("/api/admin/auth", adminAuthRoute)
 app.use("/api/admin/category", adminCategoryRoute)
+app.use("/api/admin/brand", adminBrandRoute)
+app.use("/api/admin/banner", adminBannerRoute)
+app.use("/api/admin/product", adminProductRoute)
 
 
 app.use((req, res, next) => {
@@ -38,6 +47,11 @@ app.use((error, req, res, next) => {
     if (error.status == 400) {
         return res.status(400).json({
             message: "Bad request"
+        })
+    }
+    if (error.status == 401) {
+        return res.status(401).json({
+            message: "You have no permission"
         })
     }
     return res.status(500).json({
