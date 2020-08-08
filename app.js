@@ -4,6 +4,7 @@ const morgan = require("morgan")
 const bodyParser = require("body-parser")
 const mongoose = require('mongoose')
 const fileUpload = require('express-fileupload')
+const Authenticate = require('./api/Middleware/authenticate')
 
 const app = express()
 app.use(morgan('dev'))
@@ -17,20 +18,25 @@ app.use('/uploads/brand', express.static('uploads/brand/'))
 app.use('/uploads/banner', express.static('uploads/banner/'))
 app.use('/uploads/product', express.static('uploads/product/'))
 
-// Main Routes
+// Admin Main Routes
 const adminAuthRoute = require("./api/Routes/Admin/Auth")
 const adminCategoryRoute = require("./api/Routes/Admin/Category")
 const adminBrandRoute = require("./api/Routes/Admin/Brand")
 const adminBannerRoute = require("./api/Routes/Admin/Banner")
 const adminProductRoute = require("./api/Routes/Admin/Product")
 
-// API URL's
-app.use("/api/admin/auth", adminAuthRoute)
-app.use("/api/admin/category", adminCategoryRoute)
-app.use("/api/admin/brand", adminBrandRoute)
-app.use("/api/admin/banner", adminBannerRoute)
-app.use("/api/admin/product", adminProductRoute)
+// User Main Routes
+const userRoute = require('./api/Routes/User/route')
 
+// Admin API URL's
+app.use("/api/admin/auth", adminAuthRoute)
+app.use("/api/admin/category", Authenticate, adminCategoryRoute)
+app.use("/api/admin/brand", Authenticate, adminBrandRoute)
+app.use("/api/admin/banner", Authenticate, adminBannerRoute)
+app.use("/api/admin/product", Authenticate, adminProductRoute)
+
+// User API URL's
+app.use("/api/user", userRoute)
 
 app.use((req, res, next) => {
     let error = new Error('404 page Not Found')
