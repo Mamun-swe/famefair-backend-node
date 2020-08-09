@@ -13,5 +13,6 @@ router.get('/category/products', categoryController.categoryWithProducts)
 router.get('/brand/index', brandController.brandIndex)
 
 router.get('/products/category/:id', productController.productByCategory)
+router.get('/product/:id/show', productController.singleProduct)
 
 module.exports = router

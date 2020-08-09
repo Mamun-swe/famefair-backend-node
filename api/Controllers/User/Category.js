@@ -4,7 +4,6 @@ const URL = require('../../../url')
 // Category Index
 const categoryIndex = async (req, res, next) => {
     try {
-        // const categories = await Category.find().populate('products').sort({ _id: 1 })
         const categories = await Category.find().sort({ _id: 1 }).exec()
         if (categories.length <= 0) {
             return res.status(204).json({ message: 'Category null' })

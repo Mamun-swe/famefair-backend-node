@@ -1,6 +1,7 @@
 const Product = require('../../../models/Product')
 const Category = require('../../../models/Category')
 const Brand = require('../../../models/Brand')
+const checkId = require('../../Middleware/mongooseId')
 const URL = require('../../../url')
 
 const increment = () => {
@@ -137,6 +138,7 @@ const show = async (req, res, next) => {
     let { id } = req.params
 
     try {
+        await checkId(id)
         const product = await Product.findById({ _id: id })
             .populate('brand')
             .populate('category')
@@ -167,6 +169,7 @@ const updateInfo = async (req, res, next) => {
     let updateData = req.body
 
     try {
+        await checkId(id)
         let product = await Product.findOne({ _id: id }).exec()
         if (!product) {
             return res.status(204).json({ message: 'Product not found' })
@@ -194,6 +197,7 @@ const updateImage = async (req, res, next) => {
     let { id } = req.params
 
     try {
+        await checkId(id)
         let product = await Product.findOne({ _id: id }).exec()
         if (!product) {
             return res.status(204).json({ message: 'Product not found' })
@@ -233,6 +237,7 @@ const deleteProduct = async (req, res, next) => {
     let { id } = req.params
 
     try {
+        await checkId(id)
         let product = await Product.findOneAndDelete({ _id: id }).exec()
         if (!product) {
             return res.status(204).json({ message: false })

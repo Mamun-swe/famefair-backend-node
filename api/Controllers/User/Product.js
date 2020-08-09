@@ -29,8 +29,40 @@ const productByCategory = async (req, res, next) => {
 }
 
 
+// Single Product
+const singleProduct = async (req, res, next) => {
+    let { id } = req.params
+
+    try {
+        await checkId(id)
+        const product = await Product.findById({ _id: id })
+            .populate('brand')
+            .populate('category')
+            .exec()
+        if (!product) {
+            return res.status(204).json('No Product available')
+        }
+        res.status(200).json({
+            id: product._id,
+            code: product.product_code,
+            brand: product.brand.name,
+            category: product.category.name,
+            name: product.name,
+            price: product.price,
+            quantity: product.quantity,
+            description: product.description,
+            image: URL + "uploads/product/" + product.image
+        })
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+
 
 
 module.exports = {
-    productByCategory
+    productByCategory,
+    singleProduct
 }
