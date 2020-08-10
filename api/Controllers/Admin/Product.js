@@ -33,20 +33,19 @@ const index = async (req, res, next) => {
                         brand: product.brand.name,
                         category: product.category.name,
                         name: product.name,
+                        tag: product.tag,
                         price: product.price,
                         quantity: product.quantity,
                         image: URL + "uploads/product/" + product.image
                     };
                 })
             }
-            res.status(200).json(response);
-
-            res.status(200).json(products);
+            return res.status(200).json(response)
         }
 
 
         // find with category
-        const products = await Product.find({ category })
+        const products = await Product.find({ category: category })
             .populate('brand')
             .populate('category')
             .sort({ _id: 1 })
@@ -55,7 +54,7 @@ const index = async (req, res, next) => {
         if (!products || products.length <= 0) {
             return res.status(204).json('No products')
         }
-        const response = {
+        const newResponse = {
             results: products.map(product => {
                 return {
                     id: product._id,
@@ -63,13 +62,15 @@ const index = async (req, res, next) => {
                     brand: product.brand.name,
                     category: product.category.name,
                     name: product.name,
+                    tag: product.tag,
                     price: product.price,
                     quantity: product.quantity,
                     image: URL + "uploads/product/" + product.image
                 };
             })
         }
-        res.status(200).json(response);
+        res.status(200).json(newResponse);
+
     } catch (error) {
         next(error)
     }
@@ -78,7 +79,7 @@ const index = async (req, res, next) => {
 
 // Store Product
 const store = async (req, res, next) => {
-    let { name, price, quantity, brand_id, category_id, description } = req.body
+    let { name, price, quantity, brand_id, category_id, description, tag } = req.body
 
     try {
 
@@ -105,6 +106,7 @@ const store = async (req, res, next) => {
             name: name,
             price: price,
             quantity: quantity,
+            tag: tag,
             description: description,
             image: product_image
         })
@@ -154,6 +156,7 @@ const show = async (req, res, next) => {
             name: product.name,
             price: product.price,
             quantity: product.quantity,
+            tag: product.tag,
             description: product.description,
             image: URL + "uploads/product/" + product.image
         })
@@ -187,7 +190,10 @@ const updateInfo = async (req, res, next) => {
         return res.status(200).json({ message: true })
 
     } catch (error) {
-        next(error)
+        if (error) {
+            console.log(error.name);
+        }
+        // next(error)
     }
 }
 

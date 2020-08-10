@@ -29,7 +29,7 @@ const productByCategory = async (req, res, next) => {
 }
 
 
-// Single Product
+// Single Product with related product's
 const singleProduct = async (req, res, next) => {
     let { id } = req.params
 
@@ -42,24 +42,34 @@ const singleProduct = async (req, res, next) => {
         if (!product) {
             return res.status(204).json('No Product available')
         }
+
+        const relatedProducts = await Product.find({ tag: new RegExp(product.tag, "i") }).exec()
+
         res.status(200).json({
             id: product._id,
             code: product.product_code,
             brand: product.brand.name,
             category: product.category.name,
             name: product.name,
+            tag: product.tag,
             price: product.price,
             quantity: product.quantity,
             description: product.description,
-            image: URL + "uploads/product/" + product.image
+            image: URL + "uploads/product/" + product.image,
+            products: relatedProducts.map(product => {
+                return {
+                    product_id: product._id,
+                    product_name: product.name,
+                    price: product.price,
+                    image: URL + "uploads/product/" + product.image
+                }
+            })
         })
 
     } catch (error) {
         next(error)
     }
 }
-
-
 
 
 module.exports = {

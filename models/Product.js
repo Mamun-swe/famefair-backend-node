@@ -31,6 +31,11 @@ const productSchema = new Schema({
         required: true,
         trim: true
     },
+    tag: {
+        type: String,
+        trim: true,
+        required: true
+    },
     description: {
         type: String,
         trim: true,
@@ -46,5 +51,4 @@ const productSchema = new Schema({
 })
 
 const Product = model('Product', productSchema)
-
 module.exports = Product;
