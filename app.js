@@ -1,4 +1,5 @@
 const express = require("express")
+const compression = require('compression')
 const cors = require("cors")
 const morgan = require("morgan")
 const bodyParser = require("body-parser")
@@ -7,6 +8,7 @@ const fileUpload = require('express-fileupload')
 const Authenticate = require('./api/Middleware/authenticate')
 
 const app = express()
+app.use(compression())
 app.use(morgan('dev'))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -15,6 +17,7 @@ app.use(fileUpload())
 
 app.use('/uploads/category', express.static('uploads/category/'))
 app.use('/uploads/brand', express.static('uploads/brand/'))
+// app.use('/uploads/banner', Authenticate, express.static('uploads/banner/'))
 app.use('/uploads/banner', express.static('uploads/banner/'))
 app.use('/uploads/product', express.static('uploads/product/'))
 
